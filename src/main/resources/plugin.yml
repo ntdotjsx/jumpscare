@@ -1,0 +1,10 @@
+name: JumpscarePlugin
+version: 1.0.0
+main: ntdotjsx.jumpscare.JumpscarePlugin
+api-version: '1.21'
+
+commands:
+  jumpscare:
+    description: Trigger jumpscare on a player
+    usage: /jumpscare <player>
+    permission: jumpscare.use
