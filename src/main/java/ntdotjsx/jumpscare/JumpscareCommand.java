@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class JumpscareCommand implements CommandExecutor {
 
@@ -31,40 +33,50 @@ public class JumpscareCommand implements CommandExecutor {
         }
 
         triggerJumpscare(target);
-        sender.sendMessage("§aSent jumpscare to " + target.getName());
+        sender.sendMessage("§aSent jumpscare to §e" + target.getName());
         return true;
     }
 
     private void triggerJumpscare(Player player) {
-        // 1. เล่นเสียง ItemsAdder
-        player.playSound(player.getLocation(),
-                "minecafe:welcome_sound", 2.0f, 1.0f);
 
-        // 2. จอสั่น
-        player.getWorld().spawnParticle(
-                org.bukkit.Particle.EXPLOSION,
-                player.getLocation(), 1);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            showJumpscareHUD(player);
+            shakeCamera(player);
+            player.addPotionEffect(new PotionEffect(
+                    PotionEffectType.BLINDNESS, 60, 1, false, false, false
+            ));
+            player.playSound(player.getLocation(), "minecraft:welcome", 2.0f, 1.0f);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                hideJumpscareHUD(player);
+            }, 30L);
 
-        // ใช้ shake camera ของ Paper API
-        shakeCamera(player);
+        }, 10L);
+    }
 
-        // 3. Title เต็มจอ
-        player.sendTitle(
-                "§4§l⚠ BOO! ⚠",
-                "§cYou have been jumpscared!",
-                5, 40, 10
+    private void showJumpscareHUD(Player player) {
+        Bukkit.dispatchCommand(
+                Bukkit.getConsoleSender(),
+                "iaplaytotemanimation jumpscare:jumpscare_face " + player.getName()
         );
     }
 
-    private void shakeCamera(Player player) {
-        // Paper API 1.21 รองรับ shake โดยตรง
-        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
-            player.getWorld().playEffect(
-                    player.getLocation(),
-                    org.bukkit.Effect.BLAZE_SHOOT, 0);
-        }, 0L, 1L);
+    private void hideJumpscareHUD(Player player) {
+        if (!player.isOnline()) return;
+        // ลบ blindness ออก
+        player.removePotionEffect(PotionEffectType.BLINDNESS);
+    }
 
-        // หยุดสั่นหลัง 2 วินาที
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {}, 40L);
+    private void shakeCamera(Player player) {
+        final int[] ticks = {0};
+        final int duration = 15;
+
+        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+            if (ticks[0] >= duration || !player.isOnline()) {
+                task.cancel();
+                return;
+            }
+            player.damage(0.0);
+            ticks[0]++;
+        }, 0L, 2L);
     }
 }
