@@ -7,6 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
+
 public class JumpscareCommand implements CommandExecutor {
 
     private final JavaPlugin plugin;
@@ -17,18 +19,41 @@ public class JumpscareCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("jumpscare.use")) {
-            sender.sendMessage("§cNo permission!");
+
+        // --- /jumpscare reload ---
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            if (!sender.isOp()) {
+                sender.sendMessage("§cคุณต้องเป็น OP เท่านั้น!");
+                return true;
+            }
+            plugin.reloadConfig();
+            sender.sendMessage("§aโหลด config ใหม่เรียบร้อย!");
             return true;
         }
+
+        // --- OP check ---
+        if (!sender.isOp()) {
+            sender.sendMessage("§cคุณต้องเป็น OP เท่านั้น!");
+            return true;
+        }
+
+        // --- Usage ---
         if (args.length < 1) {
             sender.sendMessage("§cUsage: /jumpscare <player>");
+            sender.sendMessage("§cUsage: /jumpscare reload");
             return true;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            sender.sendMessage("§cPlayer not found!");
+            sender.sendMessage("§cไม่พบผู้เล่น: §e" + args[0]);
+            return true;
+        }
+
+        // --- Exempt list check ---
+        List<String> exemptList = plugin.getConfig().getStringList("exempt-players");
+        if (exemptList.stream().anyMatch(name -> name.equalsIgnoreCase(target.getName()))) {
+            sender.sendMessage("§c" + target.getName() + " §7อยู่ในรายชื่อที่ห้าม jumpscare!");
             return true;
         }
 
@@ -38,7 +63,6 @@ public class JumpscareCommand implements CommandExecutor {
     }
 
     private void triggerJumpscare(Player player) {
-
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             showJumpscareHUD(player);
             shakeCamera(player);
@@ -49,7 +73,6 @@ public class JumpscareCommand implements CommandExecutor {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 hideJumpscareHUD(player);
             }, 30L);
-
         }, 10L);
     }
 
@@ -62,7 +85,6 @@ public class JumpscareCommand implements CommandExecutor {
 
     private void hideJumpscareHUD(Player player) {
         if (!player.isOnline()) return;
-        // ลบ blindness ออก
         player.removePotionEffect(PotionEffectType.BLINDNESS);
     }
 

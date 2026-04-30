@@ -1,0 +1,6 @@
+# รายชื่อผู้เล่นที่ห้าม jumpscare เด็ดขาด (case-insensitive)
+exempt-players:
+  - Meatx01     #ntdotjsx
+  - PaperX      #paperx
+  - KimTaeWon_8556 # ป่นน้อยซอยยิ๊ก
+  # เพิ่มรายชื่อได้เรื่อยๆ
