@@ -1,0 +1,16 @@
+info:
+  namespace: jumpscare
+
+hud:
+  jumpscare_face:
+    enabled: true
+    show_default: false
+    elements:
+      face_image:
+        type: image
+        x: -1000
+        y: 0
+        path: jumpscare:jumpscare_face
+        width: 255
+        height: 255
+        scale_ratio: 8 

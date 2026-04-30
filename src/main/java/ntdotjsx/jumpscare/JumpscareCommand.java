@@ -45,7 +45,7 @@ public class JumpscareCommand implements CommandExecutor {
             player.addPotionEffect(new PotionEffect(
                     PotionEffectType.BLINDNESS, 60, 1, false, false, false
             ));
-            player.playSound(player.getLocation(), "minecraft:welcome", 2.0f, 1.0f);
+            player.playSound(player.getLocation(), "minecraft:jc_01", 2.0f, 1.0f);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 hideJumpscareHUD(player);
             }, 30L);

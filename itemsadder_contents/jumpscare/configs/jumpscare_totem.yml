@@ -1,0 +1,14 @@
+info:
+  namespace: jumpscare
+
+items:
+  jumpscare_face:
+    display_name: "Jumpscare"
+    permission: jumpscare.totem
+    resource:
+      material: TOTEM_OF_UNDYING
+      generate: false
+      model_path: minecafe:jumpscare_face
+    totem_animation:
+      enabled: true
+      texture_path: jumpscare:jumpscare_face  # ← รูปที่วางไว้
